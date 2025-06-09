@@ -534,6 +534,26 @@ def gerar_nomes_arquivos() -> Tuple[str, str, str, str, str, str, str, str]:
     )
 
 
+def inserir_emprestimo_no_resumo(df_resumo_diario: pd.DataFrame, df_saldo_extra_diario: pd.DataFrame) -> pd.DataFrame:
+    """
+    Insere a coluna 'TOTAL_DIA' do saldo extra diário no resumo diário, 
+    entre as colunas 'Data' e 'SALARY', renomeando para 'EMPRESTIMO'.
+    """
+    # Garante que as datas estão no mesmo formato
+    df_resumo = df_resumo_diario.copy()
+    df_saldo = df_saldo_extra_diario[['Data', 'TOTAL_DIA']].copy()
+    df_saldo = df_saldo.rename(columns={'TOTAL_DIA': 'EMPRESTIMO'})
+    # Faz o merge pela coluna Data
+    df_merged = pd.merge(df_resumo, df_saldo, on='Data', how='left')
+    # Move a coluna EMPRESTIMO para logo após Data
+    cols = df_merged.columns.tolist()
+    if 'EMPRESTIMO' in cols and 'Data' in cols:
+        cols.insert(cols.index('Data') + 1, cols.pop(cols.index('EMPRESTIMO')))
+    # Opcional: garantir que SALARY existe antes de ordenar
+    df_merged = df_merged[cols]
+    return df_merged
+
+
 def main():
     """Fluxo principal de execução."""
     logging.info(
@@ -566,6 +586,10 @@ def main():
         return
 
     logging.info(f"Dados recuperados com sucesso.")
+
+    # Adicione esta linha para criar o DataFrame com a coluna EMPRESTIMO
+    df_resumo_diario_com_emprestimo = inserir_emprestimo_no_resumo(
+        df_resumo_diario, df_saldo_extra_diario)
 
     # Exibe análise de saldo extra
     print(f"\n=== ANÁLISE SALDO EXTRA EMPRESTADO ===")
@@ -667,8 +691,9 @@ def main():
     # Salve com aba base_historica
     sucesso_dist = salvar_em_excel(df_distribuicao_detalhada, excel_dist, "base_historica") and salvar_em_csv(
         df_distribuicao_detalhada, csv_dist)
+    # ALTERE AQUI: use o DataFrame com EMPRESTIMO
     sucesso_res = salvar_em_excel(
-        df_resumo_diario, excel_res, "base_historica") and salvar_em_csv(df_resumo_diario, csv_res)
+        df_resumo_diario_com_emprestimo, excel_res, "base_historica") and salvar_em_csv(df_resumo_diario_com_emprestimo, csv_res)
     sucesso_saldo = salvar_em_excel(
         df_saldo_extra, excel_saldo) and salvar_em_csv(df_saldo_extra, csv_saldo)
     sucesso_saldo_diario = salvar_em_excel(df_saldo_extra_diario, excel_saldo_diario) and salvar_em_csv(

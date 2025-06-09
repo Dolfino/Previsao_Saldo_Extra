@@ -1,0 +1,11 @@
+# ambiente virtual
+env/
+# arquivos de cache Python
+__pycache__/
+*.pyc
+# logs
+*.log
+# dados grandes
+*.csv
+# objetos serializados
+*.joblib
