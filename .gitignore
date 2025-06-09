@@ -1,11 +1,20 @@
 # ambiente virtual
 env/
-# arquivos de cache Python
+# se você preferir chamar de .venv, inclua também:
+# .venv/
+
+# arquivo de variáveis de ambiente
+.env
+
+# caches e compilados python
 __pycache__/
 *.pyc
+
 # logs
 *.log
-# dados grandes
+
+# dados grandes (se você não quer versionar CSVs)
 *.csv
-# objetos serializados
+
+# modelos serializados
 *.joblib
