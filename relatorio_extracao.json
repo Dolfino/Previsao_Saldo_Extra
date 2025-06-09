@@ -1,0 +1,379 @@
+{
+  "timestamp_extracao": "2025-05-30T15:40:12.817512",
+  "arquivo_origem": "dashboard_data.json",
+  "informacoes_extraidas": {
+    "metricas": {
+      "rmse": {
+        "nome": "Root Mean Square Error",
+        "valor_atual": 803859,
+        "valor_original": 1493382,
+        "melhoria_percentual": 46.2,
+        "desvio_padrao": 156901
+      },
+      "mae": {
+        "nome": "Mean Absolute Error",
+        "valor_atual": 451715,
+        "valor_original": 787888,
+        "melhoria_percentual": 42.7,
+        "desvio_padrao": 93612
+      },
+      "r2": {
+        "nome": "Coeficiente de Determinação",
+        "valor_atual": 0.49,
+        "valor_original": 0.72,
+        "melhoria_percentual": -31.7,
+        "desvio_padrao": 0.132
+      },
+      "mape": {
+        "nome": "Mean Absolute Percentage Error",
+        "valor_atual": 42.4,
+        "valor_original": 15.2,
+        "melhoria_percentual": -179.1,
+        "desvio_padrao": 11.2
+      }
+    },
+    "features": [
+      {
+        "rank": 1,
+        "nome": "SALARY_ma_3",
+        "tipo": "exog",
+        "importancia": 1.0,
+        "descricao": "Média móvel de 3 períodos",
+        "categoria": "salario"
+      },
+      {
+        "rank": 2,
+        "nome": "dia_mes",
+        "tipo": "temporal",
+        "importancia": 0.9,
+        "descricao": "Feature: Dia Mes",
+        "categoria": "temporal"
+      },
+      {
+        "rank": 3,
+        "nome": "SALARY_std_3",
+        "tipo": "exog",
+        "importancia": 0.8,
+        "descricao": "Desvio padrão de 3 períodos",
+        "categoria": "salario"
+      },
+      {
+        "rank": 4,
+        "nome": "SALARY_ma_7",
+        "tipo": "exog",
+        "importancia": 0.7,
+        "descricao": "Média móvel de 7 períodos",
+        "categoria": "salario"
+      },
+      {
+        "rank": 5,
+        "nome": "TOTAL_DIA",
+        "tipo": "other",
+        "importancia": 0.6,
+        "descricao": "Feature: Total Dia",
+        "categoria": "temporal"
+      },
+      {
+        "rank": 6,
+        "nome": "SALARY_ma_14",
+        "tipo": "exog",
+        "importancia": 0.5,
+        "descricao": "Feature: Salary Ma 14",
+        "categoria": "salario"
+      },
+      {
+        "rank": 7,
+        "nome": "SALARY_ma_30",
+        "tipo": "exog",
+        "importancia": 0.3999999999999999,
+        "descricao": "Média móvel de 3 períodos",
+        "categoria": "salario"
+      },
+      {
+        "rank": 8,
+        "nome": "SALARY_lag_30",
+        "tipo": "exog",
+        "importancia": 0.29999999999999993,
+        "descricao": "Feature: Salary Lag 30",
+        "categoria": "salario"
+      },
+      {
+        "rank": 9,
+        "nome": "SALARY_lag_2",
+        "tipo": "exog",
+        "importancia": 0.19999999999999996,
+        "descricao": "Feature: Salary Lag 2",
+        "categoria": "salario"
+      },
+      {
+        "rank": 10,
+        "nome": "SALARY_lag_3",
+        "tipo": "exog",
+        "importancia": 0.09999999999999998,
+        "descricao": "Feature: Salary Lag 3",
+        "categoria": "salario"
+      }
+    ],
+    "resumo_features": {
+      "total": 10,
+      "por_tipo": {
+        "exog": [
+          "SALARY_ma_3",
+          "SALARY_std_3",
+          "SALARY_ma_7",
+          "SALARY_ma_14",
+          "SALARY_ma_30",
+          "SALARY_lag_30",
+          "SALARY_lag_2",
+          "SALARY_lag_3"
+        ],
+        "temporal": [
+          "dia_mes"
+        ],
+        "other": [
+          "TOTAL_DIA"
+        ]
+      },
+      "top_5": [
+        {
+          "rank": 1,
+          "nome": "SALARY_ma_3",
+          "tipo": "exog",
+          "importancia": 1.0,
+          "descricao": "Média móvel de 3 períodos",
+          "categoria": "salario"
+        },
+        {
+          "rank": 2,
+          "nome": "dia_mes",
+          "tipo": "temporal",
+          "importancia": 0.9,
+          "descricao": "Feature: Dia Mes",
+          "categoria": "temporal"
+        },
+        {
+          "rank": 3,
+          "nome": "SALARY_std_3",
+          "tipo": "exog",
+          "importancia": 0.8,
+          "descricao": "Desvio padrão de 3 períodos",
+          "categoria": "salario"
+        },
+        {
+          "rank": 4,
+          "nome": "SALARY_ma_7",
+          "tipo": "exog",
+          "importancia": 0.7,
+          "descricao": "Média móvel de 7 períodos",
+          "categoria": "salario"
+        },
+        {
+          "rank": 5,
+          "nome": "TOTAL_DIA",
+          "tipo": "other",
+          "importancia": 0.6,
+          "descricao": "Feature: Total Dia",
+          "categoria": "temporal"
+        }
+      ]
+    },
+    "modelo": {
+      "especificacao": "SARIMAX(3, 1, 3)(0, 0, 0, 0)",
+      "ordem_ar": "3",
+      "ordem_ma": "N/A",
+      "diferenciacao": "N/A",
+      "aic": 717.41,
+      "bic": 789.13,
+      "log_likelihood": "N/A",
+      "n_parametros": 17,
+      "convergiu": true
+    },
+    "serie_temporal": {
+      "dados": [
+        {
+          "data": "2025-04-29",
+          "valor": 919312,
+          "log_valor": 13.7314,
+          "data_formatada": "29/04/2025"
+        },
+        {
+          "data": "2025-04-30",
+          "valor": 3027875,
+          "log_valor": 14.9234,
+          "data_formatada": "30/04/2025"
+        },
+        {
+          "data": "2025-05-01",
+          "valor": 921240,
+          "log_valor": 13.7335,
+          "data_formatada": "01/05/2025"
+        },
+        {
+          "data": "2025-05-02",
+          "valor": 2029644,
+          "log_valor": 14.5234,
+          "data_formatada": "02/05/2025"
+        },
+        {
+          "data": "2025-05-03",
+          "valor": 856650,
+          "log_valor": 13.6608,
+          "data_formatada": "03/05/2025"
+        },
+        {
+          "data": "2025-05-04",
+          "valor": 474221,
+          "log_valor": 13.0694,
+          "data_formatada": "04/05/2025"
+        },
+        {
+          "data": "2025-05-05",
+          "valor": 2192811,
+          "log_valor": 14.6007,
+          "data_formatada": "05/05/2025"
+        },
+        {
+          "data": "2025-05-06",
+          "valor": 3295528,
+          "log_valor": 15.0081,
+          "data_formatada": "06/05/2025"
+        },
+        {
+          "data": "2025-05-07",
+          "valor": 5278517,
+          "log_valor": 15.4792,
+          "data_formatada": "07/05/2025"
+        },
+        {
+          "data": "2025-05-08",
+          "valor": 4756362,
+          "log_valor": 15.375,
+          "data_formatada": "08/05/2025"
+        },
+        {
+          "data": "2025-05-09",
+          "valor": 2824399,
+          "log_valor": 14.8538,
+          "data_formatada": "09/05/2025"
+        },
+        {
+          "data": "2025-05-10",
+          "valor": 1679911,
+          "log_valor": 14.3343,
+          "data_formatada": "10/05/2025"
+        },
+        {
+          "data": "2025-05-11",
+          "valor": 804354,
+          "log_valor": 13.5978,
+          "data_formatada": "11/05/2025"
+        },
+        {
+          "data": "2025-05-12",
+          "valor": 1160505,
+          "log_valor": 13.9644,
+          "data_formatada": "12/05/2025"
+        },
+        {
+          "data": "2025-05-13",
+          "valor": 765578,
+          "log_valor": 13.5484,
+          "data_formatada": "13/05/2025"
+        },
+        {
+          "data": "2025-05-14",
+          "valor": 565681,
+          "log_valor": 13.2458,
+          "data_formatada": "14/05/2025"
+        },
+        {
+          "data": "2025-05-15",
+          "valor": 727398,
+          "log_valor": 13.4972,
+          "data_formatada": "15/05/2025"
+        },
+        {
+          "data": "2025-05-16",
+          "valor": 664150,
+          "log_valor": 13.4063,
+          "data_formatada": "16/05/2025"
+        },
+        {
+          "data": "2025-05-17",
+          "valor": 610481,
+          "log_valor": 13.322,
+          "data_formatada": "17/05/2025"
+        },
+        {
+          "data": "2025-05-18",
+          "valor": 361052,
+          "log_valor": 12.7968,
+          "data_formatada": "18/05/2025"
+        },
+        {
+          "data": "2025-05-19",
+          "valor": 482254,
+          "log_valor": 13.0862,
+          "data_formatada": "19/05/2025"
+        },
+        {
+          "data": "2025-05-20",
+          "valor": 738270,
+          "log_valor": 13.5121,
+          "data_formatada": "20/05/2025"
+        },
+        {
+          "data": "2025-05-21",
+          "valor": 481527,
+          "log_valor": 13.0847,
+          "data_formatada": "21/05/2025"
+        },
+        {
+          "data": "2025-05-22",
+          "valor": 404257,
+          "log_valor": 12.9098,
+          "data_formatada": "22/05/2025"
+        },
+        {
+          "data": "2025-05-23",
+          "valor": 479195,
+          "log_valor": 13.0799,
+          "data_formatada": "23/05/2025"
+        },
+        {
+          "data": "2025-05-24",
+          "valor": 445978,
+          "log_valor": 13.008,
+          "data_formatada": "24/05/2025"
+        },
+        {
+          "data": "2025-05-25",
+          "valor": 297625,
+          "log_valor": 12.6036,
+          "data_formatada": "25/05/2025"
+        },
+        {
+          "data": "2025-05-26",
+          "valor": 316617,
+          "log_valor": 12.6655,
+          "data_formatada": "26/05/2025"
+        },
+        {
+          "data": "2025-05-27",
+          "valor": 347177,
+          "log_valor": 12.7576,
+          "data_formatada": "27/05/2025"
+        },
+        {
+          "data": "2025-05-28",
+          "valor": 534902,
+          "log_valor": 13.1898,
+          "data_formatada": "28/05/2025"
+        }
+      ],
+      "estatisticas": {
+        "total_pontos": 30,
+        "valor_medio": 1281449.0333333334,
+        "valor_mediano": 732834.0,
+        "desvio_padrao": 1293582.6156168377,
+        "valor_minimo": 
