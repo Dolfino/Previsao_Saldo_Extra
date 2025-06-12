@@ -1,0 +1,524 @@
+{
+  "timestamp": "2025-06-11T20:13:34.419335",
+  "metricas": {
+    "rmse": {
+      "atual": 990624,
+      "std": 368852,
+      "original": 1493382,
+      "melhoria": 33.7
+    },
+    "mae": {
+      "atual": 537603,
+      "std": 165305,
+      "original": 787888,
+      "melhoria": 31.8
+    },
+    "mape": {
+      "atual": 45.4,
+      "std": 8.3,
+      "original": 15.2,
+      "melhoria": -198.4
+    },
+    "r2": {
+      "atual": 0.21,
+      "std": 0.472,
+      "original": 0.72,
+      "melhoria": -70.9
+    }
+  },
+  "features": [
+    {
+      "name": "SALARY_ma_3",
+      "type": "exog",
+      "importance": 1.0,
+      "description": "Média móvel de 3 períodos"
+    },
+    {
+      "name": "dia_mes",
+      "type": "temporal",
+      "importance": 0.9,
+      "description": "Feature: Dia Mes"
+    },
+    {
+      "name": "SALARY_std_3",
+      "type": "exog",
+      "importance": 0.8,
+      "description": "Desvio padrão de 3 períodos"
+    },
+    {
+      "name": "SALARY_ma_7",
+      "type": "exog",
+      "importance": 0.7,
+      "description": "Média móvel de 7 períodos"
+    },
+    {
+      "name": "TOTAL_DIA",
+      "type": "other",
+      "importance": 0.6,
+      "description": "Feature: Total Dia"
+    },
+    {
+      "name": "SALARY_ma_14",
+      "type": "exog",
+      "importance": 0.5,
+      "description": "Feature: Salary Ma 14"
+    },
+    {
+      "name": "SALARY_std_30",
+      "type": "exog",
+      "importance": 0.3999999999999999,
+      "description": "Desvio padrão de 3 períodos"
+    },
+    {
+      "name": "SALARY_lag_30",
+      "type": "exog",
+      "importance": 0.29999999999999993,
+      "description": "Feature: Salary Lag 30"
+    },
+    {
+      "name": "SALARY_lag_2",
+      "type": "exog",
+      "importance": 0.19999999999999996,
+      "description": "Feature: Salary Lag 2"
+    },
+    {
+      "name": "SALARY_lag_3",
+      "type": "exog",
+      "importance": 0.09999999999999998,
+      "description": "Feature: Salary Lag 3"
+    }
+  ],
+  "modelo": {
+    "especificacao": "SARIMAX(3, 1, 3)(0, 0, 0, 0)",
+    "ordem": [
+      3,
+      1,
+      3
+    ],
+    "ordem_sazonal": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "aic": 713.18,
+    "bic": 784.9,
+    "parametros": 17,
+    "convergiu": true
+  },
+  "serie_temporal": [
+    {
+      "data": "2025-04-29",
+      "valor": 919312,
+      "log_valor": 13.7314
+    },
+    {
+      "data": "2025-04-30",
+      "valor": 3027875,
+      "log_valor": 14.9234
+    },
+    {
+      "data": "2025-05-01",
+      "valor": 921240,
+      "log_valor": 13.7335
+    },
+    {
+      "data": "2025-05-02",
+      "valor": 2029644,
+      "log_valor": 14.5234
+    },
+    {
+      "data": "2025-05-03",
+      "valor": 856650,
+      "log_valor": 13.6608
+    },
+    {
+      "data": "2025-05-04",
+      "valor": 474221,
+      "log_valor": 13.0694
+    },
+    {
+      "data": "2025-05-05",
+      "valor": 2192811,
+      "log_valor": 14.6007
+    },
+    {
+      "data": "2025-05-06",
+      "valor": 3295528,
+      "log_valor": 15.0081
+    },
+    {
+      "data": "2025-05-07",
+      "valor": 5278517,
+      "log_valor": 15.4792
+    },
+    {
+      "data": "2025-05-08",
+      "valor": 4756362,
+      "log_valor": 15.375
+    },
+    {
+      "data": "2025-05-09",
+      "valor": 2824399,
+      "log_valor": 14.8538
+    },
+    {
+      "data": "2025-05-10",
+      "valor": 1679911,
+      "log_valor": 14.3343
+    },
+    {
+      "data": "2025-05-11",
+      "valor": 804354,
+      "log_valor": 13.5978
+    },
+    {
+      "data": "2025-05-12",
+      "valor": 1160505,
+      "log_valor": 13.9644
+    },
+    {
+      "data": "2025-05-13",
+      "valor": 765578,
+      "log_valor": 13.5484
+    },
+    {
+      "data": "2025-05-14",
+      "valor": 565681,
+      "log_valor": 13.2458
+    },
+    {
+      "data": "2025-05-15",
+      "valor": 727398,
+      "log_valor": 13.4972
+    },
+    {
+      "data": "2025-05-16",
+      "valor": 664150,
+      "log_valor": 13.4063
+    },
+    {
+      "data": "2025-05-17",
+      "valor": 610481,
+      "log_valor": 13.322
+    },
+    {
+      "data": "2025-05-18",
+      "valor": 361052,
+      "log_valor": 12.7968
+    },
+    {
+      "data": "2025-05-19",
+      "valor": 482254,
+      "log_valor": 13.0862
+    },
+    {
+      "data": "2025-05-20",
+      "valor": 738270,
+      "log_valor": 13.5121
+    },
+    {
+      "data": "2025-05-21",
+      "valor": 481527,
+      "log_valor": 13.0847
+    },
+    {
+      "data": "2025-05-22",
+      "valor": 404257,
+      "log_valor": 12.9098
+    },
+    {
+      "data": "2025-05-23",
+      "valor": 479195,
+      "log_valor": 13.0799
+    },
+    {
+      "data": "2025-05-24",
+      "valor": 445978,
+      "log_valor": 13.008
+    },
+    {
+      "data": "2025-05-25",
+      "valor": 297625,
+      "log_valor": 12.6036
+    },
+    {
+      "data": "2025-05-26",
+      "valor": 316617,
+      "log_valor": 12.6655
+    },
+    {
+      "data": "2025-05-27",
+      "valor": 347177,
+      "log_valor": 12.7576
+    },
+    {
+      "data": "2025-05-28",
+      "valor": 534902,
+      "log_valor": 13.1898
+    }
+  ],
+  "validacao": [
+    {
+      "fold": 1,
+      "train_size": 304,
+      "test_size": 40,
+      "train_period": "2024-01-08 a 2024-11-06",
+      "test_period": "2024-11-07 a 2024-12-16",
+      "rmse": 819213.0,
+      "mae": 449515.0,
+      "mape": 43.0,
+      "r2": 0.368,
+      "bias": -79684.0,
+      "direcao_correta": 61.5
+    },
+    {
+      "fold": 2,
+      "train_size": 344,
+      "test_size": 40,
+      "train_period": "2024-01-08 a 2024-12-16",
+      "test_period": "2024-12-17 a 2025-01-25",
+      "rmse": 519926.0,
+      "mae": 313216.0,
+      "mape": 56.7,
+      "r2": 0.665,
+      "bias": 1403.0,
+      "direcao_correta": 64.1
+    },
+    {
+      "fold": 3,
+      "train_size": 384,
+      "test_size": 40,
+      "train_period": "2024-01-08 a 2025-01-25",
+      "test_period": "2025-01-26 a 2025-03-06",
+      "rmse": 1345679.0,
+      "mae": 776570.0,
+      "mape": 50.8,
+      "r2": 0.023,
+      "bias": -700890.0,
+      "direcao_correta": 84.6
+    },
+    {
+      "fold": 4,
+      "train_size": 424,
+      "test_size": 40,
+      "train_period": "2024-01-08 a 2025-03-06",
+      "test_period": "2025-03-07 a 2025-04-15",
+      "rmse": 772175.0,
+      "mae": 477626.0,
+      "mape": 32.0,
+      "r2": 0.61,
+      "bias": -412465.0,
+      "direcao_correta": 74.4
+    },
+    {
+      "fold": 5,
+      "train_size": 464,
+      "test_size": 40,
+      "train_period": "2024-01-08 a 2025-04-15",
+      "test_period": "2025-04-16 a 2025-05-25",
+      "rmse": 1496131.0,
+      "mae": 671090.0,
+      "mape": 44.3,
+      "r2": -0.619,
+      "bias": -14058.0,
+      "direcao_correta": 71.8
+    }
+  ],
+  "outliers": [
+    {
+      "data": "2025-04-04",
+      "valor": 5278517,
+      "log_valor": 15.4792
+    },
+    {
+      "data": "2025-05-07",
+      "valor": 5278517,
+      "log_valor": 15.4792
+    },
+    {
+      "data": "2025-03-06",
+      "valor": 5278517,
+      "log_valor": 15.4792
+    },
+    {
+      "data": "2025-03-07",
+      "valor": 5278517,
+      "log_valor": 15.4792
+    },
+    {
+      "data": "2025-02-06",
+      "valor": 5278517,
+      "log_valor": 15.4792
+    },
+    {
+      "data": "2024-12-06",
+      "valor": 5278517,
+      "log_valor": 15.4792
+    },
+    {
+      "data": "2024-10-04",
+      "valor": 4953779,
+      "log_valor": 15.4157
+    },
+    {
+      "data": "2024-09-06",
+      "valor": 4851903,
+      "log_valor": 15.3949
+    },
+    {
+      "data": "2025-05-08",
+      "valor": 4756362,
+      "log_valor": 15.375
+    },
+    {
+      "data": "2025-01-07",
+      "valor": 4684646,
+      "log_valor": 15.3598
+    }
+  ],
+  "comparacao_modelos": [
+    {
+      "nome": "Log_Emprestimo",
+      "especificacao": "SARIMAX(3, 1, 3)(0, 0, 0, 0)",
+      "aic": 713.18,
+      "bic": 784.9,
+      "rmse": 990624,
+      "mae": 537603,
+      "r2": 0.21,
+      "melhor": true,
+      "convergiu": true,
+      "estavel": true,
+      "n_parametros": 17
+    },
+    {
+      "nome": "SARIMAX(1,1,1)",
+      "especificacao": "SARIMAX(1,1,1)",
+      "aic": 748.84,
+      "bic": 824.14,
+      "rmse": 1040155,
+      "mae": 564483,
+      "r2": 0.2,
+      "melhor": false,
+      "convergiu": true,
+      "estavel": true,
+      "n_parametros": 3
+    },
+    {
+      "nome": "SARIMAX(2,1,2)",
+      "especificacao": "SARIMAX(2,1,2)",
+      "aic": 784.5,
+      "bic": 863.39,
+      "rmse": 1089687,
+      "mae": 591363,
+      "r2": 0.19,
+      "melhor": false,
+      "convergiu": true,
+      "estavel": true,
+      "n_parametros": 5
+    },
+    {
+      "nome": "SARIMAX(1,1,2)",
+      "especificacao": "SARIMAX(1,1,2)",
+      "aic": 820.16,
+      "bic": 902.63,
+      "rmse": 1139218,
+      "mae": 618243,
+      "r2": 0.182,
+      "melhor": false,
+      "convergiu": true,
+      "estavel": false,
+      "n_parametros": 4
+    },
+    {
+      "nome": "SARIMAX(3,1,1)",
+      "especificacao": "SARIMAX(3,1,1)",
+      "aic": 855.82,
+      "bic": 941.88,
+      "rmse": 1188749,
+      "mae": 645123,
+      "r2": 0.175,
+      "melhor": false,
+      "convergiu": true,
+      "estavel": false,
+      "n_parametros": 5
+    }
+  ],
+  "previsoes": [
+    {
+      "data": "2025-05-29",
+      "dia_semana": "Thursday",
+      "valor": 5592222,
+      "valor_formatado": "R$ 5,592,222",
+      "intervalo_inferior": 2220187,
+      "intervalo_superior": 14085722,
+      "intervalo_formatado": "[2,220,187 - 14,085,722]"
+    },
+    {
+      "data": "2025-05-30",
+      "dia_semana": "Friday",
+      "valor": 7253223,
+      "valor_formatado": "R$ 7,253,223",
+      "intervalo_inferior": 2452239,
+      "intervalo_superior": 21453553,
+      "intervalo_formatado": "[2,452,239 - 21,453,553]"
+    },
+    {
+      "data": "2025-05-31",
+      "dia_semana": "Saturday",
+      "valor": 4925659,
+      "valor_formatado": "R$ 4,925,659",
+      "intervalo_inferior": 1568237,
+      "intervalo_superior": 15470944,
+      "intervalo_formatado": "[1,568,237 - 15,470,944]"
+    },
+    {
+      "data": "2025-06-01",
+      "dia_semana": "Sunday",
+      "valor": 3652209,
+      "valor_formatado": "R$ 3,652,210",
+      "intervalo_inferior": 1130209,
+      "intervalo_superior": 11801911,
+      "intervalo_formatado": "[1,130,209 - 11,801,911]"
+    },
+    {
+      "data": "2025-06-02",
+      "dia_semana": "Monday",
+      "valor": 5435409,
+      "valor_formatado": "R$ 5,435,410",
+      "intervalo_inferior": 1657832,
+      "intervalo_superior": 17820666,
+      "intervalo_formatado": "[1,657,832 - 17,820,666]"
+    },
+    {
+      "data": "2025-06-03",
+      "dia_semana": "Tuesday",
+      "valor": 5722781,
+      "valor_formatado": "R$ 5,722,782",
+      "intervalo_inferior": 1731438,
+      "intervalo_superior": 18915045,
+      "intervalo_formatado": "[1,731,438 - 18,915,045]"
+    },
+    {
+      "data": "2025-06-04",
+      "dia_semana": "Wednesday",
+      "valor": 3605244,
+      "valor_formatado": "R$ 3,605,244",
+      "intervalo_inferior": 1084006,
+      "intervalo_superior": 11990499,
+      "intervalo_formatado": "[1,084,006 - 11,990,499]"
+    }
+  ],
+  "configuracao": {
+    "target_col": "Log_Emprestimo",
+    "exog_cols": [
+      "SALARY",
+      "RESCISSION"
+    ],
+    "total_features_criadas": 10,
+    "features_selecionadas": 10,
+    "periodo_inicio": "2024-01-08",
+    "periodo_fim": "2025-05-28",
+    "total_observacoes": 507
+  }
+}
