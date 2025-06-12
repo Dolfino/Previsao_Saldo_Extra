@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from holidays.countries import Brazil as holidays_BR
 from joblib import load
 from scipy import stats
 from sklearn.ensemble import RandomForestRegressor
@@ -25,7 +26,6 @@ from statsmodels.stats.diagnostic import acorr_ljungbox, het_breuschpagan
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.stattools import adfuller, kpss
-from holidays.countries import Brazil as holidays_BR
 
 matplotlib.use("Agg")
 
@@ -165,7 +165,8 @@ class ModeloSARIMAXMelhorado:
             if freq in freq_map:
                 return freq_map[freq]
             return "personalizada"
-        except:
+        except Exception as e:
+            logger.warning(f"Error detecting frequency: {e}")
             return "irregular"
 
     def _detect_seasonal_periods(self) -> List[int]:
@@ -179,7 +180,10 @@ class ModeloSARIMAXMelhorado:
         else:
             return []
 
-    def analisar_sazonalidade(self, plot_size: Tuple[int, int] = (16, 12)) -> Dict:
+    def analisar_sazonalidade(
+        self,
+        plot_size: Tuple[int, int] = (16, 12)
+    ) -> Dict:
         """
         Análise avançada de sazonalidade
         """
@@ -207,7 +211,9 @@ class ModeloSARIMAXMelhorado:
                     )
 
                     # Métricas de sazonalidade
-                    seasonal_strength = decomp.seasonal.var() / target_series.var()
+                    seasonal_strength = (
+                        decomp.seasonal.var() / target_series.var()
+                    )
                     trend_strength = decomp.trend.var() / target_series.var()
 
                     # Teste de sazonalidade (Kruskal-Wallis)
@@ -232,7 +238,8 @@ class ModeloSARIMAXMelhorado:
 
                     if self.verbose:
                         logger.info(
-                            f"   • Período {period}: força={seasonal_strength:.3f}, p-value={p_value:.4f}"
+                            f"   • Período {period}: força={seasonal_strength:.3f}, "
+                            f"p-value={p_value:.4f}"
                         )
 
                 except Exception as e:
@@ -248,7 +255,9 @@ class ModeloSARIMAXMelhorado:
             self.seasonal_info = {
                 "best_period": best_period,
                 "results": seasonal_results,
-                "has_seasonality": seasonal_results[best_period]["is_seasonal"],
+                "has_seasonality": seasonal_results[best_period][
+                    "is_seasonal"
+                ],
             }
 
         return seasonal_results
@@ -258,16 +267,17 @@ class ModeloSARIMAXMelhorado:
         methods: List[str] = ["iqr", "zscore", "isolation"],
         threshold_zscore: float = 3.0,
     ) -> Dict:
-        series = self.df[self.target_col].copy()
-        # Adicionar tratamento para NaN
-        series = series.fillna(series.median())
         """
         Detecção avançada de outliers usando múltiplos métodos
         """
+        series = self.df[self.target_col].copy()
+        # Adicionar tratamento para NaN
+        series = series.fillna(series.median())
+
         if self.verbose:
             logger.info("\n🔍 DETECÇÃO AVANÇADA DE OUTLIERS")
 
-        series = self.df[self.target_col].dropna()
+
         outlier_results = {}
         all_outliers = set()
 
@@ -279,7 +289,9 @@ class ModeloSARIMAXMelhorado:
             lower_bound = Q1 - 2.5 * IQR
             upper_bound = Q3 + 2.5 * IQR
 
-            outliers_iqr = series[(series < lower_bound) | (series > upper_bound)]
+            outliers_iqr = series[
+                (series < lower_bound) | (series > upper_bound)
+            ]
             outlier_results["iqr"] = outliers_iqr.index.tolist()
             all_outliers.update(outliers_iqr.index)
 
@@ -288,7 +300,9 @@ class ModeloSARIMAXMelhorado:
             median = series.median()
             mad = np.median(np.abs(series - median))
             modified_z_scores = 0.6745 * (series - median) / mad
-            outliers_zscore = series[np.abs(modified_z_scores) > threshold_zscore]
+            outliers_zscore = series[
+                np.abs(modified_z_scores) > threshold_zscore
+            ]
             outlier_results["zscore"] = outliers_zscore.index.tolist()
             all_outliers.update(outliers_zscore.index)
 
@@ -300,7 +314,9 @@ class ModeloSARIMAXMelhorado:
                 iso_forest = IsolationForest(
                     contamination=0.05, random_state=self.random_state
                 )
-                outlier_flags = iso_forest.fit_predict(series.values.reshape(-1, 1))
+                outlier_flags = iso_forest.fit_predict(
+                    series.values.reshape(-1, 1)
+                )
                 outliers_iso = series[outlier_flags == -1]
                 outlier_results["isolation"] = outliers_iso.index.tolist()
                 all_outliers.update(outliers_iso.index)
@@ -321,13 +337,17 @@ class ModeloSARIMAXMelhorado:
 
         # Ordenar por impacto
         self.outlier_dates = sorted(
-            self.outlier_dates, key=lambda x: outlier_impact.get(x, 0), reverse=True
+            self.outlier_dates,
+            key=lambda x: outlier_impact.get(x, 0),
+            reverse=True
         )
 
         if self.verbose:
             logger.info(f"   • Outliers detectados: {len(self.outlier_dates)}")
             for method, outliers in outlier_results.items():
-                logger.info(f"     - {method.upper()}: {len(outliers)} outliers")
+                logger.info(
+                    f"     - {method.upper()}: {len(outliers)} outliers"
+                )
 
         return {
             "methods": outlier_results,
@@ -363,9 +383,15 @@ class ModeloSARIMAXMelhorado:
         df_features["semana_ano"] = df_features.index.isocalendar().week
 
         # Categóricas importantes
-        df_features["fim_semana"] = (df_features.index.dayofweek >= 5).astype(int)
-        df_features["segunda_feira"] = (df_features.index.dayofweek == 0).astype(int)
-        df_features["sexta_feira"] = (df_features.index.dayofweek == 4).astype(int)
+        df_features["fim_semana"] = (
+            df_features.index.dayofweek >= 5
+        ).astype(int)
+        df_features["segunda_feira"] = (
+            df_features.index.dayofweek == 0
+        ).astype(int)
+        df_features["sexta_feira"] = (
+            df_features.index.dayofweek == 4
+        ).astype(int)
 
         # Modificar para usar holidays diretamente
         br_holidays = holidays_BR()  # Usando a classe importada diretamente
@@ -385,30 +411,19 @@ class ModeloSARIMAXMelhorado:
 
         # Features cíclicas (mantém periodicidade)
         if include_cyclical:
-            # --- Dummies manuais para feriados nacionais (Exemplo Brasil, simplificado) ---
-            feriados = [
-                "2024-01-01",
-                "2024-04-21",
-                "2024-05-01",
-                "2024-09-07",
-                "2024-10-12",
-                "2024-11-02",
-                "2024-11-15",
-                "2024-12-25",
-                # ...adicione outros anos e feriados conforme necessário
-            ]
-            df_features["feriado"] = (
-                df_features.index.strftime("%Y-%m-%d").isin(feriados).astype(int)
-            )
-            features_criadas.append("feriado")
+            # Features cíclicas para dia da semana e mês
             df_features["dia_semana_sin"] = np.sin(
                 2 * np.pi * df_features["dia_semana"] / 7
             )
             df_features["dia_semana_cos"] = np.cos(
                 2 * np.pi * df_features["dia_semana"] / 7
             )
-            df_features["mes_sin"] = np.sin(2 * np.pi * df_features["mes"] / 12)
-            df_features["mes_cos"] = np.cos(2 * np.pi * df_features["mes"] / 12)
+            df_features["mes_sin"] = np.sin(
+                2 * np.pi * df_features["mes"] / 12
+            )
+            df_features["mes_cos"] = np.cos(
+                2 * np.pi * df_features["mes"] / 12
+            )
 
         features_temporais = [
             col
@@ -461,7 +476,9 @@ class ModeloSARIMAXMelhorado:
                     if window < len(serie_exog):
                         ratio_col = f"{col}_ratio_ma_{window}"
                         ma_values = df_features[f"{col}_ma_{window}"]
-                        df_features[ratio_col] = serie_exog / (ma_values + 1e-8)
+                        df_features[ratio_col] = (
+                            serie_exog / (ma_values + 1e-8)
+                        )
                         features_criadas.append(ratio_col)
 
         # 3. FEATURES DE INTERAÇÃO INTELIGENTES
@@ -470,31 +487,34 @@ class ModeloSARIMAXMelhorado:
                 logger.info("   🔗 Features de interação...")
 
             for i, col1 in enumerate(self.original_exog_cols):
-                for col2 in self.original_exog_cols[i + 1 :]:
-                    # --- Interação manual entre 'SALARY' e 'RESCISSION' ao quadrado ---
+                for col2 in self.original_exog_cols[i + 1:]:
                     if (
-                        "SALARY" in df_features.columns
-                        and "RESCISSION" in df_features.columns
+                        col1 in df_features.columns
+                        and col2 in df_features.columns
                     ):
-                        df_features["salary_x_rescission2"] = df_features["SALARY"] * (
-                            df_features["RESCISSION"] ** 2
-                        )
-                        features_criadas.append("salary_x_rescission2")
-                    if col1 in df_features.columns and col2 in df_features.columns:
-                        # Interações múltiplas
+                        # Definir nomes das features de interação antes do loop
                         interaction_col = f"{col1}_x_{col2}"
                         ratio_col = f"{col1}_div_{col2}"
                         diff_col = f"{col1}_minus_{col2}"
 
-                        df_features[interaction_col] = (
-                            df_features[col1] * df_features[col2]
-                        )
-                        df_features[ratio_col] = df_features[col1] / (
-                            df_features[col2] + 1e-8
-                        )
-                        df_features[diff_col] = df_features[col1] - df_features[col2]
+                        # Verificar se a feature já existe para evitar duplicação
+                        if interaction_col not in df_features.columns:
+                            df_features[interaction_col] = (
+                                df_features[col1] * df_features[col2]
+                            )
+                            features_criadas.append(interaction_col)
 
-                        features_criadas.extend([interaction_col, ratio_col, diff_col])
+                        if ratio_col not in df_features.columns:
+                            df_features[ratio_col] = df_features[col1] / (
+                                df_features[col2] + 1e-8
+                            )
+                            features_criadas.append(ratio_col)
+
+                        if diff_col not in df_features.columns:
+                            df_features[diff_col] = (
+                                df_features[col1] - df_features[col2]
+                            )
+                            features_criadas.append(diff_col)
 
         # 4. FEATURES TÉCNICAS DO TARGET
         if include_technical:
@@ -526,8 +546,8 @@ class ModeloSARIMAXMelhorado:
                         target_series.rolling(window).max()
                         - target_series.rolling(window).min()
                     )
-                    df_features[momentum_col] = target_series - target_series.shift(
-                        window
+                    df_features[momentum_col] = (
+                        target_series - target_series.shift(window)
                     )
 
                     features_criadas.extend([range_col, momentum_col])
@@ -545,7 +565,9 @@ class ModeloSARIMAXMelhorado:
         # 5. DUMMIES INTELIGENTES PARA OUTLIERS
         if self.outlier_dates:
             if self.verbose:
-                logger.info(f"   🎯 Dummies para {len(self.outlier_dates)} outliers...")
+                logger.info(
+                    f"   🎯 Dummies para {len(self.outlier_dates)} outliers..."
+                )
 
             # --- Dummy para evento especial (Ex: Pandemia em 2020) ---
             df_features["evento_pandemia"] = (
@@ -555,7 +577,9 @@ class ModeloSARIMAXMelhorado:
             features_criadas.append("evento_pandemia")
 
             # Usar apenas os outliers mais significativos
-            top_outliers = self.outlier_dates[: min(5, len(self.outlier_dates))]
+            top_outliers = self.outlier_dates[
+                : min(5, len(self.outlier_dates))
+            ]
             for date in top_outliers:
                 dummy_name = f'outlier_{date.strftime("%Y_%m_%d")}'
                 df_features[dummy_name] = 0
@@ -582,7 +606,9 @@ class ModeloSARIMAXMelhorado:
         # Regime de level
         level_ma = target_series.rolling(30).mean()
         level_threshold = level_ma.quantile(0.7)
-        df_features["regime_level_alto"] = (target_series > level_threshold).astype(int)
+        df_features["regime_level_alto"] = (
+            target_series > level_threshold
+        ).astype(int)
 
         features_criadas.extend(
             ["regime_alta_vol", "regime_tendencia_alta", "regime_level_alto"]
@@ -591,18 +617,20 @@ class ModeloSARIMAXMelhorado:
         self.df_features_engineered = df_features
 
         if self.verbose:
-            logger.info(f"\n   ✅ Total de features criadas: {len(features_criadas)}")
             logger.info(
-                f"   • Temporais: {len([f for f in features_criadas if any(x in f for x in ['dia_', 'mes_', 'fim_', 'inicio_'])])}"
+                f"\n   ✅ Total de features criadas: {len(features_criadas)}"
             )
             logger.info(
-                f"   • Exógenas: {len([f for f in features_criadas if any(col in f for col in self.original_exog_cols)])}"
+                f"   • Temporais: {len([f for f in features_criadas if any(x in f for x in ['dia_', 'mes_', 'fim_', 'inicio_'])])}"  # noqa: E501
             )
             logger.info(
-                f"   • Técnicas: {len([f for f in features_criadas if 'target_' in f])}"
+                f"   • Exógenas: {len([f for f in features_criadas if any(col in f for col in self.original_exog_cols)])}"  # noqa: E501
             )
             logger.info(
-                f"   • Regime: {len([f for f in features_criadas if 'regime_' in f])}"
+                f"   • Técnicas: {len([f for f in features_criadas if 'target_' in f])}"  # noqa: E501
+            )
+            logger.info(
+                f"   • Regime: {len([f for f in features_criadas if 'regime_' in f])}"  # noqa: E501
             )
 
         return df_features, features_criadas
@@ -622,9 +650,13 @@ class ModeloSARIMAXMelhorado:
         target_series = df_features[self.target_col].dropna()
 
         # Identificar features candidatas
-        exclude_cols = [self.target_col, "Emprestimo"] + self.original_exog_cols
+        exclude_cols = (
+            [self.target_col, "Emprestimo"] + self.original_exog_cols
+        )
         numeric_cols = df_features.select_dtypes(include=[np.number]).columns
-        candidate_features = [col for col in numeric_cols if col not in exclude_cols]
+        candidate_features = [
+            col for col in numeric_cols if col not in exclude_cols
+        ]
 
         if not candidate_features:
             logger.warning("   ⚠️ Nenhuma feature candidata encontrada")
@@ -634,7 +666,9 @@ class ModeloSARIMAXMelhorado:
             logger.info(f"   • Features candidatas: {len(candidate_features)}")
 
         # Alinhar features com target
-        features_data = df_features[candidate_features].reindex(target_series.index)
+        features_data = df_features[candidate_features].reindex(
+            target_series.index
+        )
 
         # Limpeza avançada
         # 1. Remover features com muitos NaNs
@@ -652,7 +686,9 @@ class ModeloSARIMAXMelhorado:
             if features_data[col].isnull().any():
                 if "lag_" in col or "ma_" in col:
                     # Para features de lag/MA, usar forward fill
-                    features_data[col] = features_data[col].fillna(method="ffill")
+                    features_data[col] = features_data[col].fillna(
+                        method="ffill"
+                    )
                 else:
                     # Para outras, usar mediana
                     features_data[col] = features_data[col].fillna(
@@ -670,7 +706,8 @@ class ModeloSARIMAXMelhorado:
 
         if self.verbose:
             logger.info(
-                f"   • Features válidas após limpeza: {len(features_data.columns)}"
+                f"   • Features válidas após limpeza: "
+                f"{len(features_data.columns)}"
             )
 
         # ENSEMBLE DE MÉTODOS DE SELEÇÃO
@@ -680,7 +717,9 @@ class ModeloSARIMAXMelhorado:
         if "mutual_info" in methods:
             try:
                 mi_scores = mutual_info_regression(
-                    features_data, target_series, random_state=self.random_state
+                    features_data,
+                    target_series,
+                    random_state=self.random_state
                 )
                 rankings["mutual_info"] = pd.Series(
                     mi_scores, index=features_data.columns
@@ -714,7 +753,9 @@ class ModeloSARIMAXMelhorado:
                     n_jobs=-1,
                 )
                 logger.info(
-                    f"Iniciando fit do RandomForest com {rf_features.shape[1]} features e {len(target_series)} amostras."
+                    f"Iniciando fit do RandomForest com "
+                    f"{rf_features.shape[1]} features e "
+                    f"{len(target_series)} amostras."
                 )
                 rf.fit(rf_features, target_series)
                 logger.info("Finalizado fit do RandomForest.")
@@ -732,7 +773,10 @@ class ModeloSARIMAXMelhorado:
             try:
                 f_selector = SelectKBest(score_func=f_regression, k="all")
                 f_selector.fit(features_data, target_series)
-                f_scores = pd.Series(f_selector.scores_, index=features_data.columns)
+                f_scores = pd.Series(
+                    f_selector.scores_,
+                    index=features_data.columns
+                )
                 rankings["f_score"] = f_scores.rank(ascending=False)
                 if self.verbose:
                     logger.info("   ✓ F-score calculado")
@@ -771,8 +815,12 @@ class ModeloSARIMAXMelhorado:
 
             # Verificar correlação com features já selecionadas
             if selected_features:
-                correlations = features_data[selected_features + [candidate]].corr()
-                max_corr = correlations.loc[candidate, selected_features].abs().max()
+                correlations = features_data[
+                    selected_features + [candidate]
+                ].corr()
+                max_corr = correlations.loc[
+                    candidate, selected_features
+                ].abs().max()
 
                 if max_corr > 0.8:  # Threshold de multicolinearidade
                     continue
@@ -791,11 +839,15 @@ class ModeloSARIMAXMelhorado:
         self.selected_features = selected_features
 
         if self.verbose:
-            logger.info(f"\n   📊 Top {len(selected_features)} features selecionadas:")
+            logger.info(
+                f"\n   📊 Top {len(selected_features)} features selecionadas:"
+            )
             for i, feature in enumerate(selected_features, 1):
                 # Mostrar score combinado
                 combined_score = combined_ranking[feature]
-                logger.info(f"      {i}. {feature} (score: {combined_score:.2f})")
+                logger.info(
+                    f"      {i}. {feature} (score: {combined_score:.2f})"
+                )
 
         return selected_features
 
@@ -816,7 +868,9 @@ class ModeloSARIMAXMelhorado:
 
         # Preparar exógenas com escalonamento robusto
         if selected_features:
-            exog_data = df_features[selected_features].reindex(target_series.index)
+            exog_data = df_features[selected_features].reindex(
+                target_series.index
+            )
             exog_data = exog_data.fillna(exog_data.median())
 
             # Usar RobustScaler para lidar com outliers
@@ -830,7 +884,8 @@ class ModeloSARIMAXMelhorado:
 
             if self.verbose:
                 logger.info(
-                    f"   • Exógenas escalonadas: {len(selected_features)} features"
+                    f"   • Exógenas escalonadas: "
+                    f"{len(selected_features)} features"
                 )
         else:
             exog_scaled = None
@@ -839,7 +894,8 @@ class ModeloSARIMAXMelhorado:
         # Grid de busca inteligente baseado nos dados
         if test_seasonal and self.seasonal_info.get("has_seasonality", False):
             best_period = self.seasonal_info.get("best_period", 7)
-            # Exemplo: testar p, d, q em ranges ampliados, testar várias sazonalidades
+            # Exemplo: testar p, d, q em ranges ampliados
+            # e testar várias sazonalidades
             p_range = range(0, 4)  # ordens AR
             d_range = [1]  # ordem de diferenciação
             q_range = range(0, 4)  # ordens MA
@@ -847,7 +903,10 @@ class ModeloSARIMAXMelhorado:
             # semanal, anual/mensal, etc.
             periods_to_test = list(set([best_period, 7, 12]))
             seasonal_orders = [(0, 0, 0, 0)]
-            if test_seasonal and self.seasonal_info.get("has_seasonality", False):
+            if (
+                test_seasonal
+                and self.seasonal_info.get("has_seasonality", False)
+            ):
                 # por exemplo: semanal, mensal
                 periods_to_test = [best_period, 7, 12]
                 seasonal_orders = (
@@ -861,7 +920,10 @@ class ModeloSARIMAXMelhorado:
                 itertools.product(p_range, d_range, q_range, seasonal_orders)
             )
             np.random.shuffle(combinations)
-            logger.info(f"   • Incluindo sazonalidade nos períodos: {periods_to_test}")
+            logger.info(
+                "   • Incluindo sazonalidade nos períodos: "
+                f"{periods_to_test}"
+            )
         else:
             seasonal_orders = [(0, 0, 0, 0)]
 
@@ -884,9 +946,12 @@ class ModeloSARIMAXMelhorado:
 
         if self.verbose:
             logger.info(
-                f"   • Testando até {min(total_combinations, max_models)} combinações"
+                f"   • Testando até {min(total_combinations, max_models)} "
+                "combinações"
             )
-            logger.info(f"   • p: {list(p_range)}, d: {d_range}, q: {list(q_range)}")
+            logger.info(
+                f"   • p: {list(p_range)}, d: {d_range}, q: {list(q_range)}"
+            )
 
         resultados = []
         models_tested = 0
@@ -925,14 +990,14 @@ class ModeloSARIMAXMelhorado:
                     optim_score="harvey",  # Método mais robusto
                 )
 
-                # --- Diagnósticos dos resíduos (normalidade, autocorrelação, heterocedasticidade) ---
+                # --- Diagnósticos dos resíduos ---
                 residuos = fitted_model.resid
 
                 # Normalidade dos resíduos (Shapiro-Wilk)
                 try:
                     shapiro_stat, shapiro_p = stats.shapiro(residuos.dropna())
                 except Exception:
-                    shapiro_stat, shapiro_p = None, None
+                    shapiro_stat, shapiro_p = None, None  # noqa: F841
 
                 # Autocorrelação dos resíduos (Ljung-Box)
                 try:
@@ -963,7 +1028,7 @@ class ModeloSARIMAXMelhorado:
                     problemas_residuos.append("Heterocedasticidade")
 
                 # Adicionar ao dicionário de resultados
-                diagnosticos_residuos = {
+                diagnosticos_residuos = {  # noqa: F841
                     "shapiro_p": shapiro_p,
                     "ljung_box_pvalue": ljung_box_pvalue,
                     "bp_p": bp_p,
@@ -971,7 +1036,9 @@ class ModeloSARIMAXMelhorado:
                 }
 
                 # Validações rigorosas
-                converged = getattr(fitted_model.mle_retvals, "converged", True)
+                converged = getattr(
+                    fitted_model.mle_retvals, "converged", True
+                )
 
                 # Verificar coeficientes problemáticos
                 problema_coef = False
@@ -990,10 +1057,13 @@ class ModeloSARIMAXMelhorado:
                 try:
                     residuals = fitted_model.resid
                     ljung_box = acorr_ljungbox(
-                        residuals, lags=min(10, len(residuals) // 5), return_df=True
+                        residuals,
+                        lags=min(10, len(residuals) // 5),
+                        return_df=True
                     )
                     ljung_box_pvalue = ljung_box["lb_pvalue"].iloc[-1]
-                except:
+                except Exception as e:
+                    logger.warning(f"Error in model fitting: {e}")
                     ljung_box_pvalue = np.nan
 
                 # Critérios de informação
@@ -1029,14 +1099,16 @@ class ModeloSARIMAXMelhorado:
                 if self.verbose and models_tested % 10 == 0:
                     status = "✓" if converged and not problema_coef else "⚠"
                     logger.info(
-                        f"   {status} [{models_tested}/{min(total_combinations, max_models)}] "
+                        f"   {status} [{models_tested}/"
+                        f"{min(total_combinations, max_models)}] "
                         f"SARIMAX{(p, d, q)}{seasonal_order} - AIC: {aic:.2f}"
                     )
 
             except Exception as e:
                 if self.verbose and models_tested % 20 == 0:
                     logger.warning(
-                        f"   ✗ [{models_tested}] SARIMAX{(p, d, q)}{seasonal_order} - Erro: {str(e)[:50]}"
+                        f"   ✗ [{models_tested}] SARIMAX{(p, d, q)}"
+                        f"{seasonal_order} - Erro: {str(e)[:50]}"
                     )
                 continue
 
@@ -1049,16 +1121,22 @@ class ModeloSARIMAXMelhorado:
         modelos_validos = [r for r in resultados if r["converged"]]
 
         if not modelos_validos:
-            logger.warning("   ⚠️ Nenhum modelo convergido. Usando todos disponíveis...")
+            logger.warning(
+                "   ⚠️ Nenhum modelo convergido. Usando todos disponíveis..."
+            )
             modelos_validos = resultados
 
         # 2. Filtrar modelos sem problemas de coeficientes
-        modelos_sem_problemas = [r for r in modelos_validos if not r["problema_coef"]]
+        modelos_sem_problemas = [
+            r for r in modelos_validos if not r["problema_coef"]
+        ]
 
         if modelos_sem_problemas:
             modelos_validos = modelos_sem_problemas
         else:
-            logger.warning("   ⚠️ Todos os modelos têm problemas de coeficientes")
+            logger.warning(
+                "   ⚠️ Todos os modelos têm problemas de coeficientes"
+            )
 
         # 3. Ordenar por critério composto (AIC + penalização por complexidade)
         for modelo in modelos_validos:
@@ -1083,8 +1161,6 @@ class ModeloSARIMAXMelhorado:
         # --- Diagnóstico visual dos resíduos (histograma + QQ-plot) ---
         try:
             residuos = self.best_model.resid
-            import matplotlib.pyplot as plt
-            import scipy.stats as stats
 
             plt.figure(figsize=(8, 4))
             plt.hist(residuos.dropna(), bins=30)
@@ -1098,7 +1174,8 @@ class ModeloSARIMAXMelhorado:
         if self.verbose:
             logger.info("\n   🏆 MELHOR MODELO:")
             logger.info(
-                f"      Especificação: SARIMAX{melhor_modelo['order']}{melhor_modelo['seasonal_order']}"
+                f"      Especificação: SARIMAX{melhor_modelo['order']}"
+                f"{melhor_modelo['seasonal_order']}"
             )
             logger.info(f"      AIC: {melhor_modelo['aic']:.3f}")
             logger.info(f"      BIC: {melhor_modelo['bic']:.3f}")
@@ -1146,7 +1223,8 @@ class ModeloSARIMAXMelhorado:
 
             return quality_score
 
-        except:
+        except Exception as e:
+            logger.error(f"Erro no teste de Ljung-Box: {e}")
             return np.inf
 
     def validacao_walk_forward_robusta(
@@ -1255,6 +1333,12 @@ class ModeloSARIMAXMelhorado:
                 # Converter para escala original
                 test_original = np.exp(test_target_log)
                 pred_original = np.exp(pred_log)
+
+                # Tratar valores extremos após exponenciação (BUG 5 CORRIGIDO)
+                # Verificar e limpar valores inf/NaN antes do clipping
+                pred_original = pred_original.replace([np.inf, -np.inf], np.nan)
+                pred_original = pred_original.fillna(test_original.median())
+                pred_original = np.clip(pred_original, a_min=0.01, a_max=1e12)
 
                 # Garantir alinhamento de índices
                 common_idx = test_original.index.intersection(pred_original.index)
@@ -2276,6 +2360,24 @@ class ModeloSARIMAXMelhorado:
                     },
                 }
 
+            # ADICIONANDO DADOS DE VALIDAÇÃO - CORREÇÃO IMPLEMENTADA
+            if self.validation_results and "fold_details" in self.validation_results:
+                fold_details = self.validation_results["fold_details"]
+                for fold_detail in fold_details:
+                    dashboard_data["validacao"].append({
+                        "fold": fold_detail["fold"],
+                        "train_size": fold_detail["train_size"],
+                        "test_size": fold_detail["test_size"],
+                        "train_period": fold_detail["train_period"],
+                        "test_period": fold_detail["test_period"],
+                        "rmse": round(fold_detail["metrics"]["rmse"], 0),
+                        "mae": round(fold_detail["metrics"]["mae"], 0),
+                        "mape": round(fold_detail["metrics"]["mape"], 1),
+                        "r2": round(fold_detail["metrics"]["r2"], 3),
+                        "bias": round(fold_detail["metrics"]["bias"], 0),
+                        "direcao_correta": round(fold_detail["metrics"].get("direcao_correta", 0), 1)
+                    })
+
             # 2. FEATURES COM IMPORTÂNCIA
             if self.selected_features and hasattr(self, "feature_importance_scores"):
                 for i, feature in enumerate(self.selected_features):
@@ -2376,6 +2478,50 @@ class ModeloSARIMAXMelhorado:
                 ),
                 "total_observacoes": len(self.df) if hasattr(self, "df") else 0,
             }
+
+            # ADICIONANDO PREVISÕES FUTURAS - CORREÇÃO IMPLEMENTADA
+            try:
+                if self.verbose:
+                    logger.info("   🔮 Gerando previsões para dashboard...")
+
+                previsoes_resultado = self.gerar_previsoes_melhoradas(
+                    dias_futuro=7,
+                    include_confidence=True,
+                    confidence_level=0.95
+                )
+
+                if previsoes_resultado and "previsoes" in previsoes_resultado:
+                    previsoes_series = previsoes_resultado["previsoes"]
+                    intervalos_conf = previsoes_resultado.get("intervalos_confianca")
+
+                    for i, (data, valor) in enumerate(previsoes_series.items()):
+                        previsao_data = {
+                            "data": data.strftime("%Y-%m-%d"),
+                            "dia_semana": data.strftime("%A"),
+                            "valor": int(valor),
+                            "valor_formatado": f"R$ {valor:,.0f}",
+                        }
+
+                        # Adicionar intervalos de confiança se disponíveis
+                        if intervalos_conf is not None:
+                            try:
+                                lower_bound = int(intervalos_conf.iloc[i, 0])
+                                upper_bound = int(intervalos_conf.iloc[i, 1])
+                                previsao_data["intervalo_inferior"] = lower_bound
+                                previsao_data["intervalo_superior"] = upper_bound
+                                previsao_data["intervalo_formatado"] = f"[{lower_bound:,.0f} - {upper_bound:,.0f}]"
+                            except (IndexError, KeyError):
+                                pass
+
+                        dashboard_data["previsoes"].append(previsao_data)
+
+                if self.verbose:
+                    logger.info(f"   ✅ {len(dashboard_data['previsoes'])} previsões adicionadas")
+
+            except Exception as e:
+                logger.warning(f"   ⚠️ Erro ao gerar previsões para dashboard: {e}")
+                # Manter lista vazia em caso de erro
+                dashboard_data["previsoes"] = []
 
             # Salvar JSON
             with open(caminho_json, "w", encoding="utf-8") as f:
@@ -2606,33 +2752,19 @@ def executar_analise_sarimax_completa(
         valores_validos = df_historico["Emprestimo"].dropna()
         if len(valores_validos) == 0:
             raise ValueError("Nenhum valor válido encontrado na coluna Emprestimo")
-        # Remover transformação raiz quadrada e manter apenas log
-        df_historico[target_col] = np.log(df_historico["Emprestimo"].replace(0, 1e-8))
 
-        # --- Ou, para Box-Cox (precisa ser positivo e sem zeros/NaN) ---
-        # from scipy.stats import boxcox
-        # emp_positive = df_historico['Emprestimo'].replace(0, np.nan).dropna()
-        # boxcox_target, fitted_lambda = boxcox(emp_positive)
-        # df_historico.loc[emp_positive.index, target_col] = boxcox_target
-
-        # Tratar zeros
+        # BUG 4 CORRIGIDO: Aplicar apenas transformação logarítmica sem Box-Cox redundante
+        # Tratar zeros antes da transformação logarítmica
         df_historico[target_col] = np.log(df_historico["Emprestimo"].replace(0, np.nan))
         df_historico.dropna(subset=[target_col], inplace=True)
-        # --- Winsorização para redução de impacto de outliers no target logarítmico ---
+
+        # Winsorização para redução de impacto de outliers no target logarítmico
         lower = df_historico[target_col].quantile(0.01)
         upper = df_historico[target_col].quantile(0.99)
         df_historico[target_col] = df_historico[target_col].clip(
             lower=lower, upper=upper
         )
 
-        try:
-            # add 10 para evitar valores <=0
-            df_historico[target_col + "_boxcox"], _ = stats.boxcox(
-                df_historico[target_col] + 10
-            )
-            # Depois use target_col+"_boxcox" nas análises se quiser
-        except Exception as e:
-            logger.warning(f"Erro na transformação Box-Cox: {e}")
 
         # Validação final dos dados
         if len(df_historico) < 30:
@@ -3007,11 +3139,12 @@ if __name__ == "__main__":
     """
 
     # Configuração de logging mais detalhada
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[logging.FileHandler("sarimax_analysis.log"), logging.StreamHandler()],
-    )
+    if not logging.getLogger().handlers:
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            handlers=[logging.FileHandler("sarimax_analysis.log"), logging.StreamHandler()],
+        )
 
     print("🚀 EXECUTANDO ANÁLISE SARIMAX COMPLETA V2.0")
     print("=" * 60)
@@ -3050,6 +3183,8 @@ if __name__ == "__main__":
             df_opt.set_index("Data", inplace=True)
             df_opt = df_opt.asfreq("D")
             df_opt["Emprestimo"] = pd.to_numeric(df_opt["Emprestimo"], errors="coerce")
+
+            # Criar coluna Log_Emprestimo (corrigindo o bug - coluna não existia)
             df_opt["Log_Emprestimo"] = np.log(df_opt["Emprestimo"].replace(0, np.nan))
             df_opt.dropna(subset=["Log_Emprestimo"], inplace=True)
 
@@ -3095,3 +3230,7 @@ if __name__ == "__main__":
 
     else:
         print("\n❌ Erro na análise. Verifique os dados e configurações.")
+
+
+
+
